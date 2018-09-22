@@ -1,0 +1,261 @@
+#/usr/bin/env python
+
+# -*- coding: cp1251 -*-
+
+import time
+
+import select
+
+import socet
+
+import os
+
+import sys
+
+from threading import Thread
+
+####
+
+from time import sleep
+
+from urllib2 import urlopen
+
+try:
+
+	import cPickle as pickle
+
+except:
+
+	import pickle
+
+#DICTURL = 'https://'
+
+#DICTURL = 'http://127.0.0.1/mypicklelog1.txt'
+
+DICTURL = 'http://127.0.0.1/114.txt'
+
+####
+
+class ConnectionLost: pass
+
+####
+
+def forward(client_sock, server_sock, timeout):
+
+	slist = [client_sock, server_sock]
+
+	while True:
+
+		readables, writeables, exceptions = select.select(slist, slist, [], timeout)
+
+		if (exceptions or (readables, writeables, exceptions) == ([], [], [])):
+
+			raise ConnectionLost
+
+		data = ''
+
+		for readable_sock in readables:
+
+			writeableslist = [client_sock, server_sock]
+
+			writeableslist.remove(readable_sock)
+
+			data = readable_sock.recv(512)
+
+			#print ">>>  RECV : %s" % data
+
+			if data:
+
+				print ">>>  RECV : %s" % data
+
+				writeableslist[0].send(data)
+
+			else:
+
+				raise ConnectionLost
+
+		data1 = ''
+
+		for writeable_sock in writeables:
+
+			readableslist = [client_sock, server_sock]
+
+			readableslist.remove(writeable_sock)
+
+			data1 = writeable sock.recv(512)
+
+			print ">>>  TR : %s" % data1
+
+			if data1:
+
+				print ">>>  TR : %s" % data1
+
+				readableslist[0].send(data1)
+
+			else:
+
+				raise ConnectionLost
+
+####
+
+class ForwarderClient(Thread):
+
+	def __init__(self, (from_sock, from_addr), to_addr):
+
+		Thread.__init__(self)
+
+		self.from_sock = from_sock
+
+		self.from_addr = from_addr
+
+		self.to_addr = to_addr
+
+		self.to_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+		# self.to_sock.connect(to_addr)
+
+		self.timeout = 50
+
+		self.start()
+
+	def run(self):
+
+		try:
+
+			self.to_sock.connect(self.to_addr)
+
+			forward(self.from_sock, self.to_sock, self.timeout)
+
+		except socket.error, msg:
+
+			pass
+
+		except:
+
+			pass
+
+		self.to_sock.close()
+
+		self.from_sock.close()
+
+####
+
+class ForwardetServer(Thread):
+
+	def __init__(self, addr, port):
+
+		Thread.__init__(self)
+
+		self.port = port
+
+		self.addr = addr
+
+		self.go = True
+
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+		self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+		self.sock.bind(("", port))
+
+		self.sock.listen(1)
+
+		self.start()
+
+	def run(self):
+
+		print '+ crtating server at %d, %s' % (self.port, repr(self.addr))
+
+		while self.go:
+
+			ForwarderClient(self.sock.accept(), self.addr)
+
+	def remove(self):
+
+		print '+ removing server at %s' % self.port
+
+		self.go = False
+
+		self.sock.close()
+
+####
+
+class Synchronizer(Thread):
+
+	def __init__(self):
+
+		Thread.__init__(self)
+
+		self.forwarders = {}
+
+		self.start()
+
+	def run(self):
+
+		while True:
+
+			try:
+
+				pickled_dict = urlopen(DICTURL).read()
+
+				#pickled_dict = pickle.dumps(pickled_dict, protocol=2)
+
+				#print pickled_dict
+
+			except:
+
+				print '>>', sys.exc_info()[1]
+
+			else:
+
+				#pickle.dump(adict, open('mypicklelog1.txt', 'w'))
+
+				#exit()
+
+				#unpickled_dict = pickle.loads(pickled_dict)
+
+				#print unpickled_dict
+
+				#unpickled_dict = {10000:('192.168.1.1',2234)}
+
+				unpickled_dict = {8171:('192.168.0.171',443)}
+
+				for port, addr in unpickled_dict.items():
+
+					if port in self.forwarders:
+
+						if self.forwarders[port].addr != addr:
+
+							print 'changing forwarder addr on %d to %s' % (port, addr)
+
+							self.forwarders[port].addr = addr
+
+						else:
+
+							self.forwarders[port] = ForwarderServer(addr, port)
+
+				for port in self.forwarders.keys():
+
+					if port not in unpickled_dict:
+
+						self.forwarders[port].remove()
+
+						del self.forwarders[port]
+
+			finally:
+
+				sleep(10)
+
+####
+
+s = Synchronizer()
+
+#ForwarderServer(('217.232.200.18', 433), 433)
+
+ForwarderServer(('192.168.0.171', 433), 433)
+
+#ForwarderServer(('192.168.0.171',80), 8044)
+
+#ForwarderServer(('mail.google.com', 433), 433)
+
+
