@@ -82,7 +82,7 @@ def forward(client_sock, server_sock, timeout):
 
 			readableslist.remove(writeable_sock)
 
-			data1 = writeable sock.recv(512)
+			data1 = writeable_sock.recv(512)
 
 			print ">>>  TR : %s" % data1
 
