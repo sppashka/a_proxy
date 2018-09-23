@@ -5,7 +5,7 @@
 Jumping drom proxy to proxy.
 """
 
-import os
+#import os
 import sys
 import time
 import select
@@ -30,15 +30,14 @@ DICTURL = 'http://127.0.0.1/114.txt'
 
 ####
 
-class ConnectionLost: pass
+class ConnectionLost:
     """That class don't do nothing."""
-
+    pass
 
 ####
 
 def forward(client_sock, server_sock, timeout):
     """Connected our port with proxy."""
-
     slist = [client_sock, server_sock]
 
     while True:
@@ -73,6 +72,7 @@ def forward(client_sock, server_sock, timeout):
 ####
 
 class ForwarderClient(Thread):
+    """Client connect to our port."""
 
     def __init__(self, (from_sock, from_addr), to_addr):
         Thread.__init__(self)
@@ -102,12 +102,13 @@ class ForwarderClient(Thread):
 ####
 
 class ForwarderServer(Thread):
+    """Server open or listen our port."""
 
     def __init__(self, addr, port):
         Thread.__init__(self)
         self.port = port
         self.addr = addr
-        self.go = True
+        self.go_forward = True
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(("", port))
@@ -116,17 +117,19 @@ class ForwarderServer(Thread):
 
     def run(self):
         print '+ crtating server at %d, %s' % (self.port, repr(self.addr))
-        while self.go:
+        while self.go_forward:
             ForwarderClient(self.sock.accept(), self.addr)
 
     def remove(self):
+        """Forget that proxy."""
         print '+ removing server at %s' % self.port
-        self.go = False
+        self.go_forward = False
         self.sock.close()
 
 ####
 
 class Synchronizer(Thread):
+    """Open file with proxy and remember in dict what the proxy we have use and orget what the proxy not on the file (correct memory)."""
 
     def __init__(self):
         Thread.__init__(self)
@@ -171,7 +174,7 @@ class Synchronizer(Thread):
 
 ####
 
-s = Synchronizer()
+S = Synchronizer()
 
 #ForwarderServer(('217.232.200.18', 433), 433)
 ForwarderServer(('192.168.0.171', 433), 433)
