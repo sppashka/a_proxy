@@ -95,7 +95,7 @@ class ForwarderClient(Thread):
 
 ####
 
-class ForwardetServer(Thread):
+class ForwarderServer(Thread):
 
     def __init__(self, addr, port):
         Thread.__init__(self)
