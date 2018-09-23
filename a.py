@@ -2,11 +2,11 @@
 
 # -*- coding: cp1251 -*-
 
-import time
-import select
-import socet
 import os
 import sys
+import time
+import select
+import socket
 
 from threading import Thread
 
