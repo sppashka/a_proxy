@@ -7,7 +7,7 @@ Jumping drom proxy to proxy.
 
 #import os
 import sys
-import time
+#import time
 import select
 import socket
 
@@ -91,7 +91,7 @@ class ForwarderClient(Thread):
             forward(self.from_sock, self.to_sock, self.timeout)
 
         except socket.error, msg:
-            pass
+            print '%s' % msg
 
         except:
             pass
@@ -129,7 +129,8 @@ class ForwarderServer(Thread):
 ####
 
 class Synchronizer(Thread):
-    """Open file with proxy and remember in dict what the proxy we have use and orget what the proxy not on the file (correct memory)."""
+    """Open file with proxy and remember in dict what the proxy 
+        we have use and orget what the proxy not on the file (correct memory)."""
 
     def __init__(self):
         Thread.__init__(self)
@@ -150,10 +151,10 @@ class Synchronizer(Thread):
             else:
                 #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
                 #exit()
-                #unpickled_dict = pickle.loads(pickled_dict)
+                unpickled_dict = pickle.loads(pickled_dict)
                 #print unpickled_dict
                 #unpickled_dict = {10000:('192.168.1.1',2234)}
-                unpickled_dict = {8171:('192.168.0.171', 443)}
+                #unpickled_dict = {8171:('192.168.0.171', 443)}
 
                 for port, addr in unpickled_dict.items():
                     if port in self.forwarders:
@@ -164,7 +165,8 @@ class Synchronizer(Thread):
                         else:
                             self.forwarders[port] = ForwarderServer(addr, port)
 
-                for port in self.forwarders.keys():
+                for port in self.forwarders.iterkeys():
+                #for port in self.forwarders.keys():
                     if port not in unpickled_dict:
                         self.forwarders[port].remove()
                         del self.forwarders[port]
