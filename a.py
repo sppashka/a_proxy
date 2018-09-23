@@ -129,7 +129,7 @@ class ForwarderServer(Thread):
 ####
 
 class Synchronizer(Thread):
-    """Open file with proxy and remember in dict what the proxy 
+    """Open file with proxy and remember in dict what the proxy
         we have use and orget what the proxy not on the file (correct memory)."""
 
     def __init__(self):
@@ -137,46 +137,48 @@ class Synchronizer(Thread):
         self.forwarders = {}
         self.start()
 
-    def run(self):
-        while True:
+    def my_run(self):
+#        while True:
+        try:
+            pickled_dict = urlopen(DICTURL).read()
+            #pickled_dict = pickle.dumps(pickled_dict, protocol=2)
+            #print pickled_dict
 
-            try:
-                pickled_dict = urlopen(DICTURL).read()
-                #pickled_dict = pickle.dumps(pickled_dict, protocol=2)
-                #print pickled_dict
+        except:
+            print '>>', sys.exc_info()[1]
 
-            except:
-                print '>>', sys.exc_info()[1]
+        else:
+            #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
+            #exit()
+            unpickled_dict = pickle.loads(pickled_dict)
+            #print unpickled_dict
+            #unpickled_dict = {10000:('192.168.1.1',2234)}
+            #unpickled_dict = {8171:('192.168.0.171', 443)}
 
-            else:
-                #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
-                #exit()
-                unpickled_dict = pickle.loads(pickled_dict)
-                #print unpickled_dict
-                #unpickled_dict = {10000:('192.168.1.1',2234)}
-                #unpickled_dict = {8171:('192.168.0.171', 443)}
+            for port, addr in unpickled_dict.items():
+                if port in self.forwarders:
+                    if self.forwarders[port].addr != addr:
+                        print 'changing forwarder addr on %d to %s' % (port, addr)
+                        self.forwarders[port].addr = addr
 
-                for port, addr in unpickled_dict.items():
-                    if port in self.forwarders:
-                        if self.forwarders[port].addr != addr:
-                            print 'changing forwarder addr on %d to %s' % (port, addr)
-                            self.forwarders[port].addr = addr
+                    else:
+                        self.forwarders[port] = ForwarderServer(addr, port)
 
-                        else:
-                            self.forwarders[port] = ForwarderServer(addr, port)
+            for port in self.forwarders.iterkeys():
+            #for port in self.forwarders.keys():
+                if port not in unpickled_dict:
+                    self.forwarders[port].remove()
+                    del self.forwarders[port]
 
-                for port in self.forwarders.iterkeys():
-                #for port in self.forwarders.keys():
-                    if port not in unpickled_dict:
-                        self.forwarders[port].remove()
-                        del self.forwarders[port]
-
-            finally:
-                sleep(10)
+        finally:
+            sleep(10)
 
 ####
 
 S = Synchronizer()
+
+while True:
+    S.my_run()
 
 #ForwarderServer(('217.232.200.18', 433), 433)
 ForwarderServer(('192.168.0.171', 433), 433)
