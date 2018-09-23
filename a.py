@@ -1,6 +1,9 @@
 #/usr/bin/env python
-
 # -*- coding: cp1251 -*-
+
+"""
+Jumping drom proxy to proxy.
+"""
 
 import os
 import sys
