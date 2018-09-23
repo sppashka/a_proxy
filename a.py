@@ -31,17 +31,13 @@ DICTURL = 'http://127.0.0.1/114.txt'
 ####
 
 class ConnectionLost: pass
-"""
-That class don't do nothing.
-"""
+    """That class don't do nothing."""
 
 
 ####
 
 def forward(client_sock, server_sock, timeout):
-"""
-Connected our port with proxy.
-"""
+    """Connected our port with proxy."""
 
     slist = [client_sock, server_sock]
 
