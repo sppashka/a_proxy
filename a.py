@@ -138,6 +138,7 @@ class Synchronizer(Thread):
         self.start()
 
     def my_run(self):
+        """FSM by parsing state of dict in two lists."""
 #        while True:
         try:
             pickled_dict = urlopen(DICTURL).read()
