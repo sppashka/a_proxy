@@ -15,13 +15,13 @@ from threading import Thread
 ####
 
 from time import sleep
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError, URLError
 
 try:
     import cPickle as pickle
-
-except:
+except ImportError:
     import pickle
+
 
 #DICTURL = 'https://'
 #DICTURL = 'http://127.0.0.1/mypicklelog1.txt'
@@ -97,7 +97,7 @@ class ForwarderClient(Thread):
         except socket.error, msg:
             print '%s' % msg
 
-        except:
+        else:
             pass
 
         self.to_sock.close()
@@ -149,7 +149,13 @@ class Synchronizer(Thread):
             #pickled_dict = pickle.dumps(pickled_dict, protocol=2)
             #print pickled_dict
 
-        except:
+        except HTTPError as error:
+            print '>> The server couldn\'t fulfill the request.'
+            print '>> Error code: ', error.code
+
+        except URLError as error:
+            print '>> We failed to reach a server.'
+            print '>> Reason: ', error.reason
             print '>>', sys.exc_info()[1]
 
         else:
