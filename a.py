@@ -12,7 +12,6 @@ import select
 import socket
 
 from threading import Thread
-
 ####
 
 from time import sleep
@@ -30,9 +29,14 @@ DICTURL = 'http://127.0.0.1/114.txt'
 
 ####
 
-class ConnectionLost:
+class ConnectionLost(Exception):
     """That class don't do nothing."""
-    pass
+    try:
+        raise 'str'
+    except TypeError:
+        pass
+    else:
+        assert False
 
 ####
 
@@ -135,7 +139,7 @@ class Synchronizer(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.forwarders = {}
-        self.start()
+        #self.start()
 
     def my_run(self):
         """FSM by parsing state of dict in two lists."""
