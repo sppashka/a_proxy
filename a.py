@@ -5,13 +5,12 @@
 Jumping drom proxy to proxy.
 """
 
-#import os
 import sys
-#import time
 import select
 import socket
 
 from threading import Thread
+
 ####
 
 from time import sleep
