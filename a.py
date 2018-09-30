@@ -123,7 +123,7 @@ class ForwarderServer(Thread):
         self.start()
 
     def run(self):
-        print ('+ crtating server at %d, %s' % (self.port, repr(self.addr)))
+        print ('+ creating server at %d, %s' % (self.port, repr(self.addr)))
         while self.go_forward:
             ForwarderClient(self.sock.accept(), self.addr)
 
@@ -167,7 +167,7 @@ class Synchronizer(Thread):
                 if self.forwarders[port].addr != addr:
                     self.my_add(port, addr)
                 else:
-                    self.my_forward(addr, port)
+                    self.my_forward(port, addr)
 
         for port in self.forwarders.iterkeys():
             if port not in self.unpickled_dict:
