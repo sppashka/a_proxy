@@ -5,6 +5,7 @@
 Jumping drom proxy to proxy.
 """
 
+from __future__ import print_function
 import sys
 import select
 import socket
@@ -20,6 +21,15 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+try:
+    import __builtin__ as builtins # Python 2
+except ImportError:
+    import builtins # Python 3
+
+_PRINT = print # keep a local copy of the original print
+builtins.print = lambda *args, **kwargs: _PRINT("foo:", *args, **kwargs)
+
 
 DICTURL = 'http://127.0.0.1/114.txt'
 
@@ -53,7 +63,7 @@ def forward(client_sock, server_sock, timeout):
             #print ">>>  RECV : %s" % data
 
             if data:
-                print ">>>  RECV : %s" % data
+                print (">>>  RECV : %s" % data)
                 writeableslist[0].send(data)
             else:
                 raise ConnectionLost
@@ -62,9 +72,9 @@ def forward(client_sock, server_sock, timeout):
             readableslist = [client_sock, server_sock]
             readableslist.remove(writeable_sock)
             data1 = writeable_sock.recv(512)
-            print ">>>  TR : %s" % data1
+            print (">>>  TR : %s" % data1)
             if data1:
-                print ">>>  TR : %s" % data1
+                print (">>>  TR : %s" % data1)
                 readableslist[0].send(data1)
             else:
                 raise ConnectionLost
@@ -91,10 +101,7 @@ class ForwarderClient(Thread):
             forward(self.from_sock, self.to_sock, self.timeout)
 
         except socket.error, msg:
-            print '%s' % msg
-
-        else:
-            pass
+            print ('%s' % msg)
 
         self.to_sock.close()
         self.from_sock.close()
@@ -116,13 +123,13 @@ class ForwarderServer(Thread):
         self.start()
 
     def run(self):
-        print '+ crtating server at %d, %s' % (self.port, repr(self.addr))
+        print ('+ crtating server at %d, %s' % (self.port, repr(self.addr)))
         while self.go_forward:
             ForwarderClient(self.sock.accept(), self.addr)
 
     def remove(self):
         """Forget that proxy."""
-        print '+ removing server at %s' % self.port
+        print ('+ removing server at %s' % self.port)
         self.go_forward = False
         self.sock.close()
 
@@ -145,7 +152,7 @@ class Synchronizer(Thread):
         for port, addr in unpickled_dict.items():
             if port in self.forwarders:
                 if self.forwarders[port].addr != addr:
-                    print 'changing forwarder addr on %d to %s' % (port, addr)
+                    print ('changing forwarder addr on %d to %s' % (port, addr))
                     self.forwarders[port].addr = addr
 
                 else:
@@ -163,13 +170,13 @@ class Synchronizer(Thread):
             self.pickled_dict = urlopen(DICTURL).read()
 
         except HTTPError as error:
-            print '>> The server couldn\'t fulfill the request.'
-            print '>> Error code: ', error.code
+            print ('>> The server couldn\'t fulfill the request.')
+            print ('>> Error code: ', error.code)
 
         except URLError as error:
-            print '>> We failed to reach a server.'
-            print '>> Reason: ', error.reason
-            print '>>', sys.exc_info()[1]
+            print ('>> We failed to reach a server.')
+            print ('>> Reason: ', error.reason)
+            print ('>>', sys.exc_info()[1])
 
         else:
             self.my_switch()
