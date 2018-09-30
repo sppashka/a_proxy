@@ -140,7 +140,7 @@ class Synchronizer(Thread):
         self.forwarders = {}
         #self.start()
 
-    def my_switch(self,pickled_dict):
+    def my_switch(self, pickled_dict):
             #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
             #exit()
         unpickled_dict = pickle.loads(pickled_dict)
@@ -182,7 +182,7 @@ class Synchronizer(Thread):
             print '>>', sys.exc_info()[1]
 
         else:
-            my_switch(self,pickled_dict)
+            self.my_switch(self, pickled_dict)
         finally:
             sleep(10)
 
