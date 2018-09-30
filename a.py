@@ -21,9 +21,6 @@ try:
 except ImportError:
     import pickle
 
-
-#DICTURL = 'https://'
-#DICTURL = 'http://127.0.0.1/mypicklelog1.txt'
 DICTURL = 'http://127.0.0.1/114.txt'
 
 ####
@@ -143,12 +140,7 @@ class Synchronizer(Thread):
 
     def my_switch(self):
         """Swithc operation"""
-            #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
-            #exit()
         unpickled_dict = pickle.loads(self.pickled_dict)
-            #print unpickled_dict
-            #unpickled_dict = {10000:('192.168.1.1',2234)}
-            #unpickled_dict = {8171:('192.168.0.171', 443)}
 
         for port, addr in unpickled_dict.items():
             if port in self.forwarders:
@@ -160,7 +152,6 @@ class Synchronizer(Thread):
                     self.forwarders[port] = ForwarderServer(addr, port)
 
         for port in self.forwarders.iterkeys():
-            #for port in self.forwarders.keys():
             if port not in unpickled_dict:
                 self.forwarders[port].remove()
                 del self.forwarders[port]
@@ -168,11 +159,8 @@ class Synchronizer(Thread):
 
     def my_run(self):
         """FSM by parsing state of dict in two lists."""
-#        while True:
         try:
             self.pickled_dict = urlopen(DICTURL).read()
-            #pickled_dict = pickle.dumps(pickled_dict, protocol=2)
-            #print pickled_dict
 
         except HTTPError as error:
             print '>> The server couldn\'t fulfill the request.'
@@ -195,7 +183,4 @@ S = Synchronizer()
 while True:
     S.my_run()
 
-#ForwarderServer(('217.232.200.18', 433), 433)
 ForwarderServer(('192.168.0.171', 433), 433)
-#ForwarderServer(('192.168.0.171',80), 8044)
-#ForwarderServer(('mail.google.com', 433), 433)
