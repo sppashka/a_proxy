@@ -140,6 +140,30 @@ class Synchronizer(Thread):
         self.forwarders = {}
         #self.start()
 
+    def my_switch(pickled_dict):
+            #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
+            #exit()
+        unpickled_dict = pickle.loads(pickled_dict)
+            #print unpickled_dict
+            #unpickled_dict = {10000:('192.168.1.1',2234)}
+            #unpickled_dict = {8171:('192.168.0.171', 443)}
+
+        for port, addr in unpickled_dict.items():
+            if port in self.forwarders:
+                if self.forwarders[port].addr != addr:
+                    print 'changing forwarder addr on %d to %s' % (port, addr)
+                    self.forwarders[port].addr = addr
+
+                else:
+                    self.forwarders[port] = ForwarderServer(addr, port)
+
+        for port in self.forwarders.iterkeys():
+            #for port in self.forwarders.keys():
+            if port not in unpickled_dict:
+                self.forwarders[port].remove()
+                del self.forwarders[port]
+
+
     def my_run(self):
         """FSM by parsing state of dict in two lists."""
 #        while True:
@@ -158,28 +182,7 @@ class Synchronizer(Thread):
             print '>>', sys.exc_info()[1]
 
         else:
-            #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
-            #exit()
-            unpickled_dict = pickle.loads(pickled_dict)
-            #print unpickled_dict
-            #unpickled_dict = {10000:('192.168.1.1',2234)}
-            #unpickled_dict = {8171:('192.168.0.171', 443)}
-
-            for port, addr in unpickled_dict.items():
-                if port in self.forwarders:
-                    if self.forwarders[port].addr != addr:
-                        print 'changing forwarder addr on %d to %s' % (port, addr)
-                        self.forwarders[port].addr = addr
-
-                    else:
-                        self.forwarders[port] = ForwarderServer(addr, port)
-
-            for port in self.forwarders.iterkeys():
-            #for port in self.forwarders.keys():
-                if port not in unpickled_dict:
-                    self.forwarders[port].remove()
-                    del self.forwarders[port]
-
+            my_switch(pickled_dict)
         finally:
             sleep(10)
 
