@@ -143,13 +143,13 @@ class Synchronizer(Thread):
         Thread.__init__(self)
         self.forwarders = {}
         self.pickled_dict = {}
+        self.unpickled_dict = {}
         #self.start()
 
     def my_switch(self):
         """Swithc operation"""
-        unpickled_dict = pickle.loads(self.pickled_dict)
 
-        for port, addr in unpickled_dict.items():
+        for port, addr in self.unpickled_dict.items():
             if port in self.forwarders:
                 if self.forwarders[port].addr != addr:
                     print ('changing forwarder addr on %d to %s' % (port, addr))
@@ -159,7 +159,7 @@ class Synchronizer(Thread):
                     self.forwarders[port] = ForwarderServer(addr, port)
 
         for port in self.forwarders.iterkeys():
-            if port not in unpickled_dict:
+            if port not in self.unpickled_dict:
                 self.forwarders[port].remove()
                 del self.forwarders[port]
 
@@ -167,8 +167,8 @@ class Synchronizer(Thread):
     def my_run(self):
         """FSM by parsing state of dict in two lists."""
         try:
+            # Need add integration test for format of DICTURL file
             self.pickled_dict = urlopen(DICTURL).read()
-
         except HTTPError as error:
             print ('>> The server couldn\'t fulfill the request.')
             print ('>> Error code: ', error.code)
@@ -179,6 +179,8 @@ class Synchronizer(Thread):
             print ('>>', sys.exc_info()[1])
 
         else:
+            # Possible make check the pickle.loads
+            self.unpickled_dict = pickle.loads(self.pickled_dict)
             self.my_switch()
         finally:
             sleep(10)
