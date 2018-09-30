@@ -138,12 +138,14 @@ class Synchronizer(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.forwarders = {}
+        self.pickled_dict = {}
         #self.start()
 
-    def my_switch(self, pickled_dict):
+    def my_switch(self):
+        """Swithc operation"""
             #pickle.dump(adict, open('mypicklelog1.txt', 'w'))
             #exit()
-        unpickled_dict = pickle.loads(pickled_dict)
+        unpickled_dict = pickle.loads(self.pickled_dict)
             #print unpickled_dict
             #unpickled_dict = {10000:('192.168.1.1',2234)}
             #unpickled_dict = {8171:('192.168.0.171', 443)}
@@ -168,7 +170,7 @@ class Synchronizer(Thread):
         """FSM by parsing state of dict in two lists."""
 #        while True:
         try:
-            pickled_dict = urlopen(DICTURL).read()
+            self.pickled_dict = urlopen(DICTURL).read()
             #pickled_dict = pickle.dumps(pickled_dict, protocol=2)
             #print pickled_dict
 
@@ -182,7 +184,7 @@ class Synchronizer(Thread):
             print '>>', sys.exc_info()[1]
 
         else:
-            self.my_switch(self, pickled_dict)
+            self.my_switch()
         finally:
             sleep(10)
 
