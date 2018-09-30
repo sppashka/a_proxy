@@ -146,22 +146,32 @@ class Synchronizer(Thread):
         self.unpickled_dict = {}
         #self.start()
 
+    def my_remove(self, port):
+        """Remove port and line from list of proxy"""
+        self.forwarders[port].remove()
+        del self.forwarders[port]
+
+    def my_add(self, port, addr):
+        """Add port and line addr to list of proxy"""
+        print ('changing forwarder addr on %d to %s' % (port, addr))
+        self.forwarders[port].addr = addr
+
+    def my_forward(self, port, addr):
+        """Running thread for our port for listen (server) and client thread with addr"""
+        self.forwarders[port] = ForwarderServer(addr, port)
+
     def my_switch(self):
         """Swithc operation"""
-
         for port, addr in self.unpickled_dict.items():
             if port in self.forwarders:
                 if self.forwarders[port].addr != addr:
-                    print ('changing forwarder addr on %d to %s' % (port, addr))
-                    self.forwarders[port].addr = addr
-
+                    self.my_add(port, addr)
                 else:
-                    self.forwarders[port] = ForwarderServer(addr, port)
+                    self.my_forward(addr, port)
 
         for port in self.forwarders.iterkeys():
             if port not in self.unpickled_dict:
-                self.forwarders[port].remove()
-                del self.forwarders[port]
+                self.my_remove(port)
 
 
     def my_run(self):
