@@ -11,9 +11,9 @@ from a_proxy import Synchronizer
 #@pytest.fixture()
 def test_my_add():
     """Unit Test of list"""
-    S = Synchronizer()
-    S.my_add(1111, ('192.168.0.1', 2222))
-    assert S.forwarders[1111] == ('192.168.0.1', 2222)
+    test_s = Synchronizer()
+    test_s.my_add(1111, ('192.168.0.1', 2222))
+    assert test_s.forwarders[1111] == ('192.168.0.1', 2222)
 
 
 
