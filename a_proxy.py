@@ -155,9 +155,6 @@ class Synchronizer(Thread):
         """Add port and line addr to list of proxy"""
         print ('changing forwarder addr on %d to %s' % (port, addr))
         self.forwarders[port] = addr
-        print (self.forwarders[port])
-
-
 
     def my_forward(self, port, addr):
         """Running thread for our port for listen (server) and client thread with addr"""
@@ -202,8 +199,9 @@ class Synchronizer(Thread):
 
 S = Synchronizer()
 
-while True:
-    S.my_run()
+#while True:
+#    S.my_run()
 
 
-ForwarderServer(('192.168.0.171', 433), 433)
+#ForwarderServer(('192.168.0.171', 433), 433)
+
