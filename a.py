@@ -9,6 +9,7 @@ from __future__ import print_function
 import sys
 import select
 import socket
+import pytest
 
 from threading import Thread
 
@@ -28,7 +29,7 @@ except ImportError:
     import builtins # Python 3
 
 _PRINT = print # keep a local copy of the original print
-builtins.print = lambda *args, **kwargs: _PRINT("foo:", *args, **kwargs)
+builtins.print = lambda *args, **kwargs: _PRINT("a_proxy:", *args, **kwargs)
 
 
 DICTURL = 'http://127.0.0.1/114.txt'
@@ -154,7 +155,10 @@ class Synchronizer(Thread):
     def my_add(self, port, addr):
         """Add port and line addr to list of proxy"""
         print ('changing forwarder addr on %d to %s' % (port, addr))
-        self.forwarders[port].addr = addr
+        self.forwarders[port] = addr
+        print (self.forwarders[port])
+
+
 
     def my_forward(self, port, addr):
         """Running thread for our port for listen (server) and client thread with addr"""
@@ -197,9 +201,19 @@ class Synchronizer(Thread):
 
 ####
 
+@pytest.fixture(autouse=True)
+def test_my_add(S):
+    """Unit Test of list"""
+    S.my_add(2111, ('192.168.0.1', 2222))
+    assert S.forwarders[1111] == ('192.168.0.1', 2222)
+
+
 S = Synchronizer()
 
-while True:
-    S.my_run()
+#while True:
+#S.my_run()
+#S.my_add(1111, ('192.168.0.1', 2222))
 
-ForwarderServer(('192.168.0.171', 433), 433)
+#test_my_add(S)
+
+#ForwarderServer(('192.168.0.171', 433), 433)
