@@ -9,6 +9,7 @@ from __future__ import print_function
 import sys
 import select
 import socket
+import pytest
 
 from threading import Thread
 
@@ -200,9 +201,19 @@ class Synchronizer(Thread):
 
 ####
 
+@pytest.fixture(autouse=True)
+def test_my_add(S):
+    """Unit Test of list"""
+    S.my_add(2111, ('192.168.0.1', 2222))
+    assert S.forwarders[1111] == ('192.168.0.1', 2222)
+
+
 S = Synchronizer()
 
-while True:
-    S.my_run()
+#while True:
+#S.my_run()
+#S.my_add(1111, ('192.168.0.1', 2222))
 
-ForwarderServer(('192.168.0.171', 433), 433)
+#test_my_add(S)
+
+#ForwarderServer(('192.168.0.171', 433), 433)
