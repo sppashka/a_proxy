@@ -4,8 +4,9 @@
 Test jumping drom proxy to proxy.
 """
 
-from a_proxy import Synchronizer
 #import pytest
+from a_proxy import Synchronizer
+
 
 #@pytest.fixture()
 def test_my_add():
