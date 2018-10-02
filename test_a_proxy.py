@@ -28,7 +28,7 @@ def socket():
 
 @pytest.fixture(scope='module')
 def dummy_server():
-    """Prepare object Host"""
+    """Prepare object Host then live full time of runing that module"""
     class Dummy(object): # pylint: disable=too-few-public-methods
         """Just any port for test"""
         host_port = 'localhost', 8080
@@ -37,7 +37,7 @@ def dummy_server():
     return Dummy
 
 
-def test_server_connect(socket, dummy_server):
+def test_server_connect(socket, dummy_server): # pylint: disable=redefined-outer-name
     """Test open port"""
     socket.connect(dummy_server.host_port)
     assert socket
