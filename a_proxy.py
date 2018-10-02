@@ -1,5 +1,5 @@
 #/usr/bin/env python
-# -*- coding: cp1251 -*-
+# coding: utf-8
 
 """
 Jumping drom proxy to proxy.
@@ -137,7 +137,7 @@ class ForwarderServer(Thread):
 
 class Synchronizer(Thread):
     """Open file with proxy and remember in dict what the proxy
-        we have use and orget what the proxy not on the file (correct memory)."""
+        we have use and forget what the proxy not on the file (correct memory)."""
 
     def __init__(self):
         Thread.__init__(self)
