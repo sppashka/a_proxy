@@ -20,7 +20,7 @@ from a_proxy import Synchronizer
 #    assert socket
 
 @pytest.yield_fixture
-def socket1():
+def socket():
     """Open and close socket"""
     _socket = s.socket(s.AF_INET, s.SOCK_STREAM)
     yield _socket
