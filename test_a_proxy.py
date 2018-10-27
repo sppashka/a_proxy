@@ -43,7 +43,15 @@ def test_server_connect(socket, dummy_server): # pylint: disable=redefined-outer
     assert socket
 
 def test_my_add():
-    """Unit Test of list"""
+    """Unit Test of list add"""
     test_s = Synchronizer()
     test_s.my_add(1111, ('192.168.0.1', 2222))
     assert test_s.forwarders[1111] == ('192.168.0.1', 2222)
+
+def test_my_remove():
+    """Unit Test of list remove"""
+    test_s = Synchronizer()
+    test_s.my_add(1111, ('192.168.0.1', 2222))
+    test_s.my_forward(1111, ('192.168.0.1', 2222))
+    test_s.my_remove(1111)
+    assert (1111 not in test_s.forwarders)
