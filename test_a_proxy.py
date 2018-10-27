@@ -26,6 +26,7 @@ def socket():
     yield _socket
     _socket.close()
 
+
 @pytest.fixture(scope='module')
 def dummy_server():
     """Prepare object Host then live full time of runing that module"""
@@ -59,8 +60,8 @@ def test_my_add():
     test_s.my_add(1111, ('192.168.0.1', 2222))
     assert test_s.forwarders[1111] == ('192.168.0.1', 2222)
 
-def test_my_forward(socket, dummy2_server):
-    """Test open port 2222"""
+def test_my_forward(socket, dummy2_server): # pylint: disable=redefined-outer-name
+    """Test open port 1111"""
     test_s = Synchronizer()
     test_s.go_forward = False
     test_s.my_forward(1111, ('127.0.0.1', 4444))
@@ -74,4 +75,4 @@ def test_my_remove():
     test_s.my_add(3333, ('127.0.0.1', 2222))
     test_s.my_forward(3333, ('127.0.0.1', 2222))
     test_s.my_remove(3333)
-    assert (3333 not in test_s.forwarders)
+    assert 3333 not in test_s.forwarders
