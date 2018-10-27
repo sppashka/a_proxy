@@ -37,6 +37,17 @@ def dummy_server():
     return Dummy
 
 
+@pytest.fixture(scope='module')
+def dummy2_server():
+    """Prepare object Host then live full time of runing that module"""
+    class Dummy2(object): # pylint: disable=too-few-public-methods
+        """Just any port for test"""
+        host_port = 'localhost', 1111
+        uri = 'http://%s:%s/' % host_port
+
+    return Dummy2
+
+
 def test_server_connect(socket, dummy_server): # pylint: disable=redefined-outer-name
     """Test open port"""
     socket.connect(dummy_server.host_port)
@@ -48,10 +59,19 @@ def test_my_add():
     test_s.my_add(1111, ('192.168.0.1', 2222))
     assert test_s.forwarders[1111] == ('192.168.0.1', 2222)
 
+def test_my_forward(socket, dummy2_server):
+    """Test open port 2222"""
+    test_s = Synchronizer()
+    test_s.go_forward = False
+    test_s.my_forward(1111, ('127.0.0.1', 4444))
+    socket.connect(dummy2_server.host_port)
+    assert socket
+    test_s.my_remove(1111)
+
 def test_my_remove():
     """Unit Test of list remove"""
     test_s = Synchronizer()
-    test_s.my_add(1111, ('192.168.0.1', 2222))
-    test_s.my_forward(1111, ('192.168.0.1', 2222))
-    test_s.my_remove(1111)
-    assert (1111 not in test_s.forwarders)
+    test_s.my_add(3333, ('127.0.0.1', 2222))
+    test_s.my_forward(3333, ('127.0.0.1', 2222))
+    test_s.my_remove(3333)
+    assert (3333 not in test_s.forwarders)
